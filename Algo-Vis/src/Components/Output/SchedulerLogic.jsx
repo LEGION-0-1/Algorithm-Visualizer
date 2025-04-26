@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import GanttChart from './GanntChart.jsx'
 
 function SchedulerLogic({ processes }) {
   if (!processes || processes.length === 0) {
@@ -6,7 +7,7 @@ function SchedulerLogic({ processes }) {
   }
 
   const algorithms = ['FCFS', 'SJF', 'Priority', 'RoundRobin'];
-  const timeQuantum = 2; // For Round Robin
+  const [timeQuantum, setTimeQuantum] = useState(2);
 
   const processAlgorithms = (algo) => {
     const proc = processes.map(p => ({
@@ -19,6 +20,7 @@ function SchedulerLogic({ processes }) {
     }));
 
     let scheduled = [];
+    let ganttChart = [];
     let totalWaitingTime = 0;
     let totalTurnaroundTime = 0;
     let currentTime = 0;
@@ -27,7 +29,6 @@ function SchedulerLogic({ processes }) {
 
     if (algo === 'FCFS') {
       proc.sort((a, b) => a.arrivalTime - b.arrivalTime);
-
       proc.forEach(p => {
         const startTime = Math.max(currentTime, p.arrivalTime);
         const completionTime = startTime + p.burstTime;
@@ -37,13 +38,8 @@ function SchedulerLogic({ processes }) {
         totalWaitingTime += waitingTime;
         totalTurnaroundTime += turnaroundTime;
 
-        scheduled.push({
-          id: p.id,
-          startTime,
-          completionTime,
-          turnaroundTime,
-          waitingTime,
-        });
+        scheduled.push({ id: p.id, startTime, completionTime, turnaroundTime, waitingTime });
+        ganttChart.push({ id: p.id, start: startTime, end: completionTime });
 
         currentTime = completionTime;
       });
@@ -66,13 +62,8 @@ function SchedulerLogic({ processes }) {
         totalWaitingTime += waitingTime;
         totalTurnaroundTime += turnaroundTime;
 
-        scheduled.push({
-          id: p.id,
-          startTime,
-          completionTime,
-          turnaroundTime,
-          waitingTime,
-        });
+        scheduled.push({ id: p.id, startTime, completionTime, turnaroundTime, waitingTime });
+        ganttChart.push({ id: p.id, start: startTime, end: completionTime });
 
         p.completed = true;
         completedCount++;
@@ -97,13 +88,8 @@ function SchedulerLogic({ processes }) {
         totalWaitingTime += waitingTime;
         totalTurnaroundTime += turnaroundTime;
 
-        scheduled.push({
-          id: p.id,
-          startTime,
-          completionTime,
-          turnaroundTime,
-          waitingTime,
-        });
+        scheduled.push({ id: p.id, startTime, completionTime, turnaroundTime, waitingTime });
+        ganttChart.push({ id: p.id, start: startTime, end: completionTime });
 
         p.completed = true;
         completedCount++;
@@ -132,6 +118,8 @@ function SchedulerLogic({ processes }) {
         currentTime += executionTime;
         p.remainingTime -= executionTime;
 
+        ganttChart.push({ id: p.id, start: startTime, end: currentTime });
+
         if (p.remainingTime === 0) {
           const completionTime = currentTime;
           const turnaroundTime = completionTime - p.arrivalTime;
@@ -140,22 +128,14 @@ function SchedulerLogic({ processes }) {
           totalWaitingTime += waitingTime;
           totalTurnaroundTime += turnaroundTime;
 
-          scheduled.push({
-            id: p.id,
-            startTime,
-            completionTime,
-            turnaroundTime,
-            waitingTime,
-          });
+          scheduled.push({ id: p.id, startTime: p.arrivalTime, completionTime, turnaroundTime, waitingTime });
 
           p.completed = true;
           completedCount++;
         } else {
-          // More work left for this process
           queue.push(p);
         }
 
-        // Add new arriving processes after currentTime
         while (i < n && proc[i].arrivalTime <= currentTime) {
           queue.push(proc[i]);
           i++;
@@ -166,19 +146,33 @@ function SchedulerLogic({ processes }) {
     const avgWaitingTime = (totalWaitingTime / n).toFixed(2);
     const avgTurnaroundTime = (totalTurnaroundTime / n).toFixed(2);
 
-    return { scheduled, avgWaitingTime, avgTurnaroundTime };
+    return { scheduled, ganttChart, avgWaitingTime, avgTurnaroundTime };
   };
 
   return (
-    <>
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
       {algorithms.map((algo, idx) => {
-        const { scheduled, avgWaitingTime, avgTurnaroundTime } = processAlgorithms(algo);
+        const { scheduled, ganttChart, avgWaitingTime, avgTurnaroundTime } = processAlgorithms(algo);
 
         return (
-          <div key={idx} style={{ marginBottom: "40px" }}>
-            <h2>{algo} Scheduling</h2>
+          <div key={idx} className="algorithm-box" style={{ flex: '1 1 45%', padding: '10px', border: '1px solid #ccc', borderRadius: '10px' }}>
+            <h2 style={{ textAlign: 'center' }}>{algo} Scheduling</h2>
 
-            {/* Table */}
+            {algo === 'RoundRobin' && (
+              <div style={{ marginBottom: '15px', textAlign: 'center' }}>
+                <label>Time Quantum: </label>
+                <input
+                  type="number"
+                  value={timeQuantum}
+                  min="1"
+                  onChange={(e) => setTimeQuantum(parseInt(e.target.value) || 1)}
+                  style={{ width: '60px', textAlign: 'center' }}
+                />
+              </div>
+            )}
+
+            <GanttChart chartData={ganttChart} />
+
             <table border="1" width="100%" style={{ textAlign: "center", marginBottom: "20px" }}>
               <thead>
                 <tr>
@@ -202,13 +196,12 @@ function SchedulerLogic({ processes }) {
               </tbody>
             </table>
 
-            {/* Average Times */}
             <p><strong>Average Waiting Time:</strong> {avgWaitingTime}</p>
             <p><strong>Average Turnaround Time:</strong> {avgTurnaroundTime}</p>
           </div>
         );
       })}
-    </>
+    </div>
   );
 }
 

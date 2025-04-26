@@ -1,11 +1,10 @@
 import React from 'react';
-import SchedulerLogic from './SchedulerLogic.jsx'; // Import your scheduler engine
+import SchedulerLogic from './SchedulerLogic.jsx';
 
 function Output({ processes }) {
   return (
-    <div style={{ marginTop: "40px" }}>
-      <h2>Scheduling Outputs</h2>
-      <SchedulerLogic processes={processes} algorithm="FCFS" />
+    <div className="output-container">
+      <SchedulerLogic processes={processes} />
     </div>
   );
 }

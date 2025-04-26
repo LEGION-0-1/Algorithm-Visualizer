@@ -7,7 +7,6 @@ function Input({ onProcessChange }) {
   const [burstTimes, setBurstTimes] = useState(["", "", ""]);
   const [priorities, setPriorities] = useState(["", "", ""]);
 
-  // Whenever input changes, update the parent
   React.useEffect(() => {
     const processes = ids.map((id, index) => ({
       id,
@@ -16,7 +15,7 @@ function Input({ onProcessChange }) {
       priority: priorities[index]
     }));
 
-    onProcessChange(processes); // send to App.jsx
+    onProcessChange(processes);
   }, [ids, arrivalTimes, burstTimes, priorities, onProcessChange]);
 
   return (
