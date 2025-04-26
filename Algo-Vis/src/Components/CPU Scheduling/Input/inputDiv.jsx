@@ -1,6 +1,6 @@
 import React from 'react';
-import InputField from './inputFields.jsx';
-import '../../App.css';
+import InputField from '../../inputFields.jsx';
+import '../../../App.css';
 
 function InputDiv({ divName, Field, values, setValues }) {
   const handleChange = (index, e) => {
