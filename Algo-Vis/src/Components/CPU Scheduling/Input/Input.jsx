@@ -20,7 +20,6 @@ function Input({ onProcessChange }) {
 
   return (
     <>
-      <h2>Process Inputs</h2>
       <div style={{ display: "flex", justifyContent: "space-evenly", alignItems: "flex-start", width: "100dvw", flexWrap: "wrap" }}>
         <InputDiv divName="Process ID" Field="Process " values={ids} setValues={setIds} />
         <InputDiv divName="Arrival Time" Field="Arrival " values={arrivalTimes} setValues={setArrivalTimes} />

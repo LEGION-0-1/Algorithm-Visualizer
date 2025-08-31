@@ -1,15 +1,13 @@
-import { useState } from 'react';
-import Input from './Components/CPU Scheduling/Input/Input.jsx'
-import Output from './Components/CPU Scheduling/Output/Output.jsx'
+import ModuleButton from "./Components/ModuleButton.jsx";
 
 function App() {
-  const [processes, setProcesses] = useState([]);
-
   return (
-    <>
-      <Input onProcessChange={setProcesses} />
-      <Output processes={processes} />
-    </>
+    <div className="p-4">
+      <h1 className="text-xxl text-center top font-bold mb-4">Algorithm Visualizer</h1>
+
+      {/* Pass module names here */}
+      <ModuleButton />
+    </div>
   );
 }
 
